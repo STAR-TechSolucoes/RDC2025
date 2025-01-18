@@ -1,0 +1,45 @@
+@font-face {
+    font-family: 'Principal'; 
+    src: url('../asset/font/Condiment-Regular.ttf');
+}
+@font-face {
+    font-family: 'Secundaria'; 
+    src: url('../asset/font/BreeSerif-Regular.ttf');
+}
+.fontP{
+    font-family: Principal;
+    font-size: 3dvw;
+    color: rgb(0, 0, 0);
+}
+.fontS{
+    font-family: Secundaria;
+    font-size: 1dvw;
+    color: rgb(0, 0, 0);
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* Remove a barra de rolagem */
+  }
+
+  .video-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Faz o vídeo cobrir toda a tela */
+    z-index: -1; /* Coloca o vídeo atrás do conteúdo */
+  }
+
+  .imgRDC{
+    max-width: 80dvw;
+    max-height: 80dvh;
+  }
+  .conteudo{
+    display: flex;
+    align-items: center;
+  }
+  
