@@ -1,98 +1,158 @@
 @font-face {
-    font-family: 'Principal'; 
-    src: url('../asset/font/Condiment-Regular.ttf');
+  font-family: 'Principal';
+  src: url(../asset/font/Condiment-Regular.ttf);
 }
 @font-face {
-    font-family: 'Secundaria'; 
-    src: url('../asset/font/BreeSerif-Regular.ttf');
-}
-.fontP{
-    font-family: Principal;
-    font-size: 3dvw;
-    color: rgb(0, 0, 0);
-}
-.fontS{
-    font-family: Secundaria;
-    font-size: 1dvw;
-    color: rgb(0, 0, 0);
+  font-family: Secundaria;
+  src: url(../asset/font/BreeSerif-Regular.ttf);
 }
 
+/* Estilos padrões para dispositivos móveis */
 body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden; /* Remove a barra de rolagem */
-  }
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
 
-  .video-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Faz o vídeo cobrir toda a tela */
-    z-index: -1; /* Coloca o vídeo atrás do conteúdo */
-  }
+.video-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Faz o vídeo cobrir toda a tela */
+  z-index: -1; /* Coloca o vídeo atrás do conteúdo */
+}
 
-  .imgRDC{
-    max-width: 80dvw;
-    max-height: 80dvh;
-  }
-  .conteudo{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 5%;
-  }
+.imgRDC {
+  max-width: 100%;
+  max-height: 100%;
+  width: 80%;
+  height: auto;
+}
 
+.conteudo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 20px;
+  height: 100%;
+}
+
+.mainFrase {
+  font-size: 1.46rem;
+  color: #010388;
+  font-family: Principal;
+  text-shadow: 1px 1px 0px rgb(255, 255, 255);
+}
+
+.separatorRight{
+  font-size: 1.3rem;
+  color: #010388;
+  font-family: Principal;
+  text-shadow: 1px 1px 0px rgb(255, 255, 255);
+  text-align: center;
+}
+
+.separatorOne {
+  background-color: white;
+  border-radius: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.separatorDiv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.separatorDiv button {
+  background-color: #0d33ad;
+  font-size: 1rem;
+  font-family: Secundaria;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.separatorDiv button:hover {
+  background-color: #b85252;
+  transition: 0.2s;
+}
+
+.separatorDiv a {
+  text-decoration: underline;
+  font-size: 1rem;
+  font-family: Secundaria;
+  color: #008cff;
+}
+
+.separatorDiv a:hover {
+  color: #675deb;
+}
+
+/* Estilos para dispositivos maiores (PC) */
+@media (min-width: 768px) {
   .conteudo {
-    .mainFrase {
-      color: #cf2525;
-      text-decoration-line: underline;
-      text-decoration-colorrgb(177, 143, 143)ed;
-      text-shadow: 1px 2px 2px rgb(0, 0, 0)
-    }
-
-    .separatorOne {
-      display: flex;
-      justify-content: center;
-      flex-direction: column;
-      align-items: center;
-      row-gap: 20px;
-    }
-
-    .separatorDiv {
-      border-radius: 15px;
-      width: 30dvw;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 20dvh;
-      flex-direction: column;
-      row-gap: 10px;
-
-
-      button {
-        background-color: #ac2424;
-        font-size: 30px;
-        color: #fff;
-        padding: 5px 25px;
-        border: none;
-        border-radius: 5px;
-      }
-  
-      button:hover {
-        background-color: #b85252;
-        transition: .2s;
-      }
-
-      a:hover {
-        color: #675deb;
-      }
-    }
-
-    
+    flex-direction: row;
+    gap: 40px;
+    padding: 50px;
   }
 
+  .mainFrase {
+    font-size: 2rem;
+  }
 
-  
+  .separatorOne {
+    max-width: 500px;
+    padding: 30px;
+  }
+
+  .separatorDiv button {
+    font-size: 1.2rem;
+    padding: 15px 30px;
+  }
+
+  .separatorDiv a {
+    font-size: 1.2rem;
+  }
+
+  .imgRDC {
+    width: 60%;
+  }
+}
+
+/* Estilos para telas muito grandes (monitores 4K, ultrawide) */
+@media (min-width: 1200px) {
+  .mainFrase {
+    font-size: 2.5rem;
+  }
+
+  .separatorOne {
+    max-width: 600px;
+    padding: 40px;
+  }
+
+  .separatorDiv button {
+    font-size: 1.5rem;
+    padding: 20px 40px;
+  }
+
+  .separatorDiv a {
+    font-size: 1.5rem;
+  }
+
+  .imgRDC {
+    width: 50%;
+  }
+}
+
