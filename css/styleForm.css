@@ -14,14 +14,16 @@
   }
 
   body {
-    /* background-color: #c9a609; */
     background: linear-gradient(45deg, #c9a609 79.5%, yellow 79%);
     background-repeat: no-repeat;
     background-size: cover;
     margin: 0;
-    height: 100vh;
-    overflow: hidden;
-  }
+    height: 100%;
+    /* Substituir */
+    /* overflow: hidden; */
+    min-height: 100vh;
+    overflow: auto;
+}
 
   .imgRDC {
     max-width: 100%;
@@ -76,16 +78,19 @@
         display: grid;
         margin-right: auto;
         margin-left: auto;
+        margin-bottom: 280px;
         flex-direction: row;
         justify-content: center;
-        align-items: center;
         grid-template-columns: 50% 50%;
         box-shadow: 0 4px 8px #c5c5c5dc;
+        padding: 20px;
 
         .imageLeft {
             background-color: #fff;
             border-top-left-radius: 30px;
             border-bottom-left-radius: 30px;
+            display: flex;
+            align-items: center;
         }
 
         .contentRight {

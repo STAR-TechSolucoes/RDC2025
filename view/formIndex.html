@@ -26,85 +26,149 @@
                     <form id="formInscricao">
                         <div class="row">
                             <div class="col-md-12 center mb-2">
-                                <label for="txtName">Nome Completo</label>
+                                <label for="txtName"><b>Tipo de Inscrição</b></label>
+                                <select class="form-select" aria-label="Default select example" id="tipInsc" required>
+                                    <option value="lote1">1° Lote (4 dias)</option>
+                                    <option value="lote1K">1° Lote Kids (4 dias)</option>
+                                    <option value="diaria">Diária</option>
+                                    <option value="inscricoesDiariaKids">Diária Kids</option>
+                                  </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 center mb-2">
+                                <label for="txtName"><b>Nome Completo</b></label>
                                 <input type="text" class="form-control" name="txtName" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6 mb-2">
-                                <label for="dtpDataNascimento">Data de Nascimento</label>
+                                <label for="dtpDataNascimento"><b>Data de Nascimento</b></label>
                                 <input type="date" class="form-control" name="dtpDataNascimento" required> 
                             </div>
                             <div class="form-group col-md-6 mb-2">
-                                <label for="txtIdade">Idade</label>
+                                <label for="txtIdade"><b>Idade</b></label>
                                 <input type="number" class="form-control" name="txtIdade" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6 mb-2">
-                                <label for="txtCPF">CPF</label>
+                                <label for="txtCPF"><b>CPF</b></label>
                                 <input type="text" class="form-control" name="txtCPF" id="txtCPF" required>
                             </div>
                             <div class="form-group col-md-6 mb-2">
-                                <label for="txtTelefone">Telefone</label>
+                                <label for="txtTelefone"><b>Telefone</b></label>
                                 <input type="text" id="txtTelefone" class="form-control" name="txtTelefone" pattern="\([0-9]{2}\)[\s][0-9]{4}-[0-9]{4,5}" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-12 mb-2">
-                                <label for="txtEmail">E-mail</label>
+                                <label for="txtEmail"><b>E-mail</b></label>
                                 <input type="text" class="form-control" name="txtEmail" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-12 mb-2">
-                                <label for="txtLogradouro">Logradouro</label>
+                                <label for="txtLogradouro"><b>Logradouro</b></label>
                                 <input type="text" class="form-control" name="txtLogradouro" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-12 mb-2">
-                                <label for="txtBairro">Bairro</label>
+                                <label for="txtBairro"><b>Bairro</b></label>
                                 <input type="text" class="form-control" name="txtBairro" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6 mb-2">
-                                <label for="txtNumero">Número</label>
+                                <label for="txtNumero"><b>Número</b></label>
                                 <input type="number" class="form-control" name="txtNumero" required>
                             </div>
                             <div class="form-group col-md-6 mb-2">
-                                <label for="txtCEP">CEP</label>
+                                <label for="txtCEP"><b>CEP</b></label>
                                 <input type="text" class="form-control" name="txtCEP" id="txtCEP" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6 mb-2">
-                                <label for="txtCidade">Cidade</label>
+                                <label for="txtCidade"><b>Cidade</b></label>
                                 <input type="text" class="form-control" name="txtCidade" required>
                             </div>
                             <div class="form-group col-md-6 mb-2">
-                                <label for="txtComplemento">Complemento (opcional)</label>
+                                <label for="txtComplemento"><b>Complemento (opcional)</b></label>
                                 <input type="text" class="form-control" name="txtComplemento">
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-9 mb-2">
-                                <label for="txtGrupo">Grupo de Orações</label>
+                                <label for="txtGrupo"><b>Grupo de Orações</b></label>
                                 <input type="text" class="form-control" name="txtGrupo" required>
                             </div>
                             <div class="form-group col-md-3 mb-2" >
-                                <label for="txtQtdeDias">Dias de Evento</label>
+                                <label for="txtQtdeDias"><b>Dias de Evento</b></label>
                                 <input type="number" class="form-control" name="txtQtdeDias" required>
                             </div>
+                            <!-- Primeiro retiro -->
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label for="primeiroRetiro" class="form-label"><b>É seu primeiro retiro?</b></label>
+                                        <select class="form-select" name="primeiroRetiro" id="primeiroRetiro">
+                                            <option value="Sim">Sim</option>
+                                            <option value="Não">Não</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Intolerância alimentar e alergia -->
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="alergia"><b>Possui alguma intolerância alimentar e/ou alguma alergia?</b></label>
+                                        <input class="form-control" type="text" name="alergia" id="alergia" placeholder="Se sim, qual?">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pouso -->
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="pouso"><b>Precisará de pouso?</b></label>
+                                        <select class="form-select" name="pouso" id="pouso">
+                                            <option value="Sim">Sim</option>
+                                            <option value="Não">Não</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Data de chegada -->
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="dataChegada"><b>Qual será a data de sua chegada?</b></label>
+                                        <select class="form-select" name="dataChegada" id="dataChegada">
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </form>
+                    <div class="contButtons">
+                        <button type="button" class="btn btn-success" id="buttonConfirm">Enviar</button>
+                        <button type="button" class="btn btn-danger" id="clearButton">Limpar</button>
+                    </div>
                 </div>
             </div>
-            <div class="contButtons">
-                <button type="button" class="btn btn-success" id="buttonConfirm">Enviar</button>
-                <button type="button" class="btn btn-danger" id="clearButton">Limpar</button>
-            </div>
+
         </div>
     </div>
 
@@ -112,8 +176,11 @@
         $("#txtTelefone").mask("(00) 00009-0000");
         $("#txtCPF").mask("000.000.000-00");
         $("#txtCEP").mask("00000-000");
+
+        
+
     </script>
-    <script src="../js/scriptForm.js"></script>
+    <script type="module" src="../js/scriptForm.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="sweetalert2.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
