@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Inscrições</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="container mt-4">
+    <h1 class="text-center mb-4">Dashboard de Inscrições</h1>
+
+    <div class="row text-center mb-4">
+        <div class="col-md-4">
+            <a href="index.html" class="btn btn-info">Inscrições</a>
+        </div>
+        <div class="col-md-4 p-2">
+            <a href="powerbi.html" class="btn btn-secondary">Power BI Inscrições</a>
+        </div>
+        <div class="col-md-4 p-2">
+            <a class="btn btn-secondary">Power BI Relatórios</a>
+        </div>
+        <div class="col-md-4 p-2">
+            <a class="btn btn-danger">Autenticar Inscrições</a>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <input type="text" id="search" class="form-control" placeholder="Pesquisar...">
+    </div>
+    <div class="mb-3">
+        <select id="filtroTipo" class="form-control">
+            <option value="">Todos os Tipos</option>
+            <option value="inscricoes">Lote</option>
+            <option value="inscricoesKids">Lote Kids</option>
+            <option value="inscricoesDiarias">Diária</option>
+            <option value="inscricoesDiariaKids">Diária Kids</option>
+        </select>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Ações</th>
+                    <th>Tipo de Inscrição</th>
+                    <th>Nome</th>
+                    <th>Data de Nascimento</th>
+                    <th>Idade</th>
+                    <th>CPF</th>
+                    <th>Telefone</th>
+                    <th>Email</th>
+                    <th>Logradouro</th>
+                    <th>Bairro</th>
+                    <th>Número</th>
+                    <th>CEP</th>
+                    <th>Cidade</th>
+                    <th>Complemento</th>
+                    <th>Grupo de Oração</th>
+                    <th>Dias do Evento</th>
+                    <th>Primeiro Retiro</th>
+                    <th>Alergia</th>
+                    <th>Pouso</th>
+                    <th>Dias de Participação</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-inscricoes"></tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCd2mI-E14mkZwnTQu3l_5RnzguY5Q5BOg",
+            authDomain: "rebanhaocarnaval.firebaseapp.com",
+            databaseURL: "https://rebanhaocarnaval-default-rtdb.firebaseio.com",
+            projectId: "rebanhaocarnaval",
+            storageBucket: "rebanhaocarnaval.firebasestorage.app",
+            messagingSenderId: "1064690883975",
+            appId: "1:1064690883975:web:750fd0bde27e233c820722"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        function carregarDados() {
+    const filtroTipo = document.getElementById("filtroTipo").value;
+    let nos = filtroTipo ? [filtroTipo] : ["inscricoes", "inscricoesDiarias", "inscricoesDiariaKids", "lote1", "lote1K"];
+
+    let promessas = nos.map(no => get(ref(database, no)).then(snapshot => snapshot.exists() ? snapshot.val() : {}));
+
+    Promise.all(promessas)
+        .then(results => {
+            let dadosCombinados = Object.assign({}, ...results);
+            exibirDados(dadosCombinados);
+        })
+        .catch(error => {
+            console.error("Erro ao buscar dados:", error);
+        });
+}
+
+
+        function exibirDados(data) {
+            const tabela = document.getElementById("tabela-inscricoes");
+            tabela.innerHTML = "";
+
+            Object.keys(data).forEach((key) => {
+                const inscricao = data[key];
+                const row = tabela.insertRow();
+                
+                const btnExcluir = document.createElement("button");
+                btnExcluir.innerText = "Excluir";
+                btnExcluir.classList.add("btn", "btn-danger", "btn-sm");
+                btnExcluir.onclick = () => excluirInscricao(key);
+                row.insertCell(0).appendChild(btnExcluir);
+
+                row.insertCell(1).innerText = inscricao.tipoInscricao || "-";
+                row.insertCell(2).innerText = inscricao.nome || "-";
+                row.insertCell(3).innerText = inscricao.dataNascimento || "-";
+                row.insertCell(4).innerText = inscricao.idade || "-";
+                row.insertCell(5).innerText = inscricao.cpf || "-";
+                row.insertCell(6).innerText = inscricao.telefone || "-";
+                row.insertCell(7).innerText = inscricao.email || "-";
+                row.insertCell(8).innerText = inscricao.logradouro || "-";
+                row.insertCell(9).innerText = inscricao.bairro || "-";
+                row.insertCell(10).innerText = inscricao.numero || "-";
+                row.insertCell(11).innerText = inscricao.cep || "-";
+                row.insertCell(12).innerText = inscricao.cidade || "-";
+                row.insertCell(13).innerText = inscricao.complemento || "-";
+                row.insertCell(14).innerText = inscricao.grupoOracoes || "-";
+                row.insertCell(15).innerText = inscricao.diasEvent || "-";
+                row.insertCell(16).innerText = inscricao.primeiroRetiro || "-";
+                row.insertCell(17).innerText = inscricao.alergia || "-";
+                row.insertCell(18).innerText = inscricao.pouso || "-";
+                row.insertCell(19).innerText = inscricao.diasParticipacao ? inscricao.diasParticipacao.join(", ") : "-";
+            });
+        }
+
+        function excluirInscricao(chave) {
+            Swal.fire({
+                title: "Tem certeza?",
+                text: "Essa ação não pode ser desfeita!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Sim, excluir!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    remove(ref(database, `inscricoes/${chave}`))
+                        .then(() => {
+                            Swal.fire("Excluído!", "A inscrição foi removida.", "success");
+                            carregarDados();
+                        })
+                        .catch((error) => {
+                            console.error("Erro ao excluir:", error);
+                            Swal.fire("Erro!", "Não foi possível excluir a inscrição.", "error");
+                        });
+                }
+            });
+        }
+
+        document.getElementById("filtroTipo").addEventListener("change", carregarDados);
+        document.getElementById("search").addEventListener("keyup", function () {
+            const termo = this.value.toLowerCase();
+            document.querySelectorAll("#tabela-inscricoes tr").forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(termo) ? "" : "none";
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", carregarDados);
+    </script>
+</body>
+</html>

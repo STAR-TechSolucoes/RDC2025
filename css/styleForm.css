@@ -29,7 +29,7 @@
     max-width: 100%;
     max-height: 100%;
     padding: 10px;
-    border-top-left-radius: 30px;
+
   }
 
   .video-bg {
@@ -99,3 +99,18 @@
         }
     }
   }
+
+@media (max-width: 680px) {
+  .container {
+    .FormContent{
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center;
+    }
+    .imageLeft{
+      width: 40dvh;
+      border-radius: 30px;
+    }
+  }
+
+}

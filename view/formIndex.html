@@ -68,6 +68,16 @@
                             </div>
                         </div>
                         <div class="row">
+                            <div class="form-group col-md-6 mb-2">
+                                <label for="txtCEP"><b>CEP</b></label>
+                                <input type="text" class="form-control" name="txtCEP" id="txtCEP" required>
+                            </div>
+                            <div class="form-group col-md-6 mb-2">
+                                <label for="txtCidade"><b>Cidade</b></label>
+                                <input type="text" class="form-control" name="txtCidade" disabled required>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="form-group col-md-12 mb-2">
                                 <label for="txtLogradouro"><b>Logradouro</b></label>
                                 <input type="text" class="form-control" name="txtLogradouro" required>
@@ -85,16 +95,6 @@
                                 <input type="number" class="form-control" name="txtNumero" required>
                             </div>
                             <div class="form-group col-md-6 mb-2">
-                                <label for="txtCEP"><b>CEP</b></label>
-                                <input type="text" class="form-control" name="txtCEP" id="txtCEP" required>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="form-group col-md-6 mb-2">
-                                <label for="txtCidade"><b>Cidade</b></label>
-                                <input type="text" class="form-control" name="txtCidade" required>
-                            </div>
-                            <div class="form-group col-md-6 mb-2">
                                 <label for="txtComplemento"><b>Complemento (opcional)</b></label>
                                 <input type="text" class="form-control" name="txtComplemento">
                             </div>
@@ -104,9 +104,14 @@
                                 <label for="txtGrupo"><b>Grupo de Orações</b></label>
                                 <input type="text" class="form-control" name="txtGrupo" required>
                             </div>
-                            <div class="form-group col-md-3 mb-2" >
-                                <label for="txtQtdeDias"><b>Dias de Evento</b></label>
-                                <input type="number" class="form-control" name="txtQtdeDias" required>
+                            <div class="col-md-12 center mb-2 form-group">
+                                <label for="txtName"><b>Quantos dias irá participar do Evento</b></label>
+                                <select class="form-select" aria-label="Default select example" name="diasEvent" id="diasEvent" required>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                  </select>
                             </div>
                             <!-- Primeiro retiro -->
                             <div class="row">
@@ -144,18 +149,27 @@
                                 </div>
                             </div>
 
-                            <!-- Data de chegada -->
+                            <!-- Dias de Participação -->
                             <div class="row">
                                 <div class="col">
                                     <div class="form-group">
-                                        <label class="form-label" for="dataChegada"><b>Qual será a data de sua chegada?</b></label>
-                                        <select class="form-select" name="dataChegada" id="dataChegada">
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
-                                            <option value="5">5</option>
-                                        </select>
+                                        <label class="form-label"><b>Quais dias você irá participar?</b></label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="diasParticipacao" id="dia1" value="1">
+                                            <label class="form-check-label" for="dia1">1º Dia</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="diasParticipacao" id="dia2" value="2">
+                                            <label class="form-check-label" for="dia2">2º Dia</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="diasParticipacao" id="dia3" value="3">
+                                            <label class="form-check-label" for="dia3">3º Dia</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="diasParticipacao" id="dia4" value="4">
+                                            <label class="form-check-label" for="dia4">4º Dia</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -176,8 +190,77 @@
         $("#txtTelefone").mask("(00) 00009-0000");
         $("#txtCPF").mask("000.000.000-00");
         $("#txtCEP").mask("00000-000");
+document.addEventListener("DOMContentLoaded", function () {
+    const tipoInscricao = document.getElementById("tipInsc");
+    const diasParticipacaoGroup = document.querySelector("[name='diasParticipacao']").closest(".form-group"); // Grupo de dias de participação
+    const diasEventoInput = document.querySelector("[name='diasEvent']").closest(".form-select").closest('.form-group'); // Ajuste para pegar só o grupo específico
 
-        
+
+    // Função para verificar e atualizar a exibição dos campos
+    const atualizarCampos = () => {
+        const valor = tipoInscricao.value;
+
+        if (valor === "diaria" || valor === "inscricoesDiariaKids") {
+            diasParticipacaoGroup.style.display = "block"; // Mostra o grupo de dias de participação
+            diasEventoInput.style.display = "block"
+        } else {
+            diasParticipacaoGroup.style.display = "none"; // Oculta o grupo de dias de participação
+            diasEventoInput.style.display = "none"; // Oculta o campo de dias de evento
+        }
+    };
+
+    // Evento de mudança no select
+    tipoInscricao.addEventListener("change", atualizarCampos);
+
+    // Inicializar a exibição correta dos campos
+    atualizarCampos();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('formInscricao');
+    const tipoInscricao = document.getElementById("tipInsc").value;
+    const maxDias = document.getElementById('diasEvent');
+    const diasEvento = document.querySelectorAll("[name='diasParticipacao']");
+
+    // Função para atualizar a limitação de seleção de dias
+    const atualizarLimiteDias = () => {
+        const diasSelecionados = Array.from(diasEvento).filter(dia => dia.checked).length;
+        console.log(maxDias.value)
+        diasEvento.forEach(dia => {
+            if (!dia.checked) {
+                dia.disabled = diasSelecionados >= maxDias.value; // Desabilita opções extras se o limite for atingido
+            }
+        });
+    };
+
+    // Adiciona o evento de mudança no tipo de inscrição
+    maxDias.addEventListener('change', () => {
+        diasEvento.forEach(dia => {
+            dia.checked = false; // Limpa seleções anteriores
+            dia.disabled = false; // Habilita todos os checkboxes
+        });
+        atualizarLimiteDias(); // Atualiza o limite com base na nova seleção
+    });
+
+    // Adiciona o evento de mudança nos checkboxes de dias
+    diasEvento.forEach(dia => {
+        dia.addEventListener('change', atualizarLimiteDias);
+    });
+
+    // Valida o formulário ao enviar
+    form.addEventListener('submit', (event) => {
+        const diasSelecionados = Array.from(diasEvento).filter(dia => dia.checked).length;
+
+        if (tipoInscricao.value === "diaria" || tipoInscricao.value === "inscricoesDiariaKids") {
+            if (diasSelecionados !== 1) {
+                event.preventDefault();
+                alert('Selecione apenas um dia para inscrições diárias.');
+            }
+        }
+    });
+});
+
+
 
     </script>
     <script type="module" src="../js/scriptForm.js"></script>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Inscrições</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="container mt-4">
+    <h1 class="text-center mb-4">Dashboard de Inscrições</h1>
+
+    <div class="row text-center mb-4">
+        <div class="col-md-4">
+            <a href="index.html" class="btn btn-info">Inscrições</a>
+        </div>
+        <div class="col-md-4 p-2">
+            <a href="powerbi.html" class="btn btn-secondary">Power BI Inscrições</a>
+        </div>
+        <div class="col-md-4 p-2">
+            <a class="btn btn-secondary">Power BI Relatórios</a>
+        </div>
+        <div class="col-md-4 p-2">
+            <a class="btn btn-danger">Autenticar Inscrições</a>
+        </div>
+    </div>
+    
+    <!-- Cards Estatísticos -->
+    <div class="row text-center mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Total de Inscritos</h5>
+                    <h2 id="total-inscritos">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Média de Idade</h5>
+                    <h2 id="media-idade">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>Total de Grupos</h5>
+                    <h2 id="total-grupos">0</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <canvas id="graficoIdades"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="graficoEventos"></canvas>
+        </div>
+    </div>
+
+    <!-- Filtro de Pesquisa -->
+    <input type="text" id="pesquisa" class="form-control mb-3" placeholder="Pesquisar por nome...">
+    
+    <!-- Tabela -->
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nome</th>
+                    <th>Idade</th>
+                    <th>Grupo de Oração</th>
+                    <th>Dias do Evento</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-inscricoes">
+                <!-- Dados via JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCd2mI-E14mkZwnTQu3l_5RnzguY5Q5BOg",
+            authDomain: "rebanhaocarnaval.firebaseapp.com",
+            databaseURL: "https://rebanhaocarnaval-default-rtdb.firebaseio.com",
+            projectId: "rebanhaocarnaval",
+            storageBucket: "rebanhaocarnaval.appspot.com",
+            messagingSenderId: "1064690883975",
+            appId: "1:1064690883975:web:750fd0bde27e233c820722"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        function carregarDados() {
+            const userRef = ref(database, "inscricoes");
+            get(userRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    atualizarDashboard(data);
+                } else {
+                    console.log("Nenhuma inscrição encontrada.");
+                }
+            }).catch(error => console.error("Erro ao buscar dados:", error));
+        }
+
+        function atualizarDashboard(data) {
+            const tabela = document.getElementById("tabela-inscricoes");
+            tabela.innerHTML = "";
+            let totalInscritos = 0;
+            let somaIdade = 0;
+            let grupos = new Set();
+            let idades = [];
+            let diasEvento = {};
+
+            Object.values(data).forEach((inscricao) => {
+                totalInscritos++;
+                somaIdade += parseInt(inscricao.idade || 0);
+                grupos.add(inscricao.grupoOracoes);
+                idades.push(inscricao.idade);
+                diasEvento[inscricao.diasEvent] = (diasEvento[inscricao.diasEvent] || 0) + 1;
+
+                const row = tabela.insertRow();
+                row.insertCell(0).innerText = inscricao.nome || "-";
+                row.insertCell(1).innerText = inscricao.idade || "-";
+                row.insertCell(2).innerText = inscricao.grupoOracoes || "-";
+                row.insertCell(3).innerText = inscricao.diasEvent || "-";
+            });
+
+            document.getElementById("total-inscritos").innerText = totalInscritos;
+            document.getElementById("media-idade").innerText = (totalInscritos ? (somaIdade / totalInscritos).toFixed(1) : 0);
+            document.getElementById("total-grupos").innerText = grupos.size;
+            atualizarGraficos(idades, diasEvento);
+        }
+
+        function atualizarGraficos(idades, diasEvento) {
+            new Chart(document.getElementById("graficoIdades"), {
+                type: 'bar',
+                data: { labels: idades, datasets: [{ label: 'Idades', data: idades, backgroundColor: 'blue' }] },
+            });
+            new Chart(document.getElementById("graficoEventos"), {
+                type: 'pie',
+                data: { labels: Object.keys(diasEvento), datasets: [{ data: Object.values(diasEvento), backgroundColor: ['red', 'green', 'yellow'] }] },
+            });
+        }
+
+        document.getElementById("pesquisa").addEventListener("input", function () {
+            const termo = this.value.toLowerCase();
+            document.querySelectorAll("#tabela-inscricoes tr").forEach(row => {
+                row.style.display = row.cells[0].innerText.toLowerCase().includes(termo) ? "" : "none";
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", carregarDados);
+    </script>
+</body>
+</html>
