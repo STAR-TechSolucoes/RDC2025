@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Instascan com Resolução Personalizada (Debug)</title>
+    <script type="text/javascript" src="js/instascan.min.js"></script>
+</head>
+<body>
+    <video id="preview" style="width: 320px; height: 240px;"></video>
+    <script type="text/javascript">
+      let scanner;
+
+      function startScanner(stream) {
+        let videoElement = document.createElement('video');
+        videoElement.srcObject = stream;
+        videoElement.autoplay = true;
+        videoElement.style.display = 'none'; // Oculta o vídeo
+        document.body.appendChild(videoElement);
+
+        videoElement.addEventListener('loadedmetadata', function() {
+          console.log("Metadata do vídeo carregada."); // Adiciona este log
+          videoElement.play().then(() => { // Garante que o play() seja resolvido
+            console.log("Vídeo está tocando."); // Adiciona este log
+            setTimeout(function() {
+              scanner = new Instascan.Scanner({ video: videoElement });
+              scanner.addListener('scan', function (content) {
+                console.log(content);
+              });
+
+              scanner.start(videoElement).then(() => {
+                console.log("Scanner iniciado com stream personalizado.");
+              }).catch(function (err) {
+                console.error("Erro ao iniciar o scanner com stream personalizado:", err);
+              });
+            }, 100); // Atraso de 100ms
+          }).catch(err => {
+            console.error("Erro ao iniciar o vídeo:", err);
+          });
+        });
+      }
+
+      navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }
+      })
+      .then(function(stream) {
+        startScanner(stream);
+      })
+      .catch(function(err) {
+        console.error("Erro ao obter stream de vídeo:", err);
+      });
+    </script>
+</body>
+</html>

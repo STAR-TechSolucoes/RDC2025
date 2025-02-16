@@ -1,0 +1,78 @@
+/* style.css */
+
+body.bodyLogin {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Ensure full viewport height */
+    background-color: #f8f9fa; /* Light gray background */
+}
+
+.form-container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    width: 400px; /* Adjust as needed */
+}
+
+.imgLogo {
+    width: 150px; /* Adjust logo size */
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #343a40; /* Dark gray heading */
+    margin-bottom: 20px;
+}
+
+.form-floating {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    border-color: #ced4da; /* Light gray border */
+}
+
+.form-control:focus {
+    border-color: #80bdff; /* Blue border on focus */
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Blue shadow on focus */
+}
+
+
+.btn-form {
+    width: 100%; /* Full width button */
+    margin-top: 15px;
+    margin-bottom: 10px; /* Space below button */
+}
+
+.btn-success {
+    background-color: #28a745; /* Green button */
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838; /* Darker green on hover */
+    border-color: #1e7e34;
+}
+
+a {
+    color: #007bff; /* Blue link */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive adjustments (example) */
+@media (max-width: 500px) {
+    .form-container {
+        width: 90%; /* Make form wider on smaller screens */
+        padding: 20px;
+    }
+    .imgLogo {
+        width: 120px;
+    }
+
+}

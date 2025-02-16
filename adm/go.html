@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscrição por Grupo de Oração</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Importar SheetJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 800px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="d-flex justify-content-between align-items-center p-3 bg-dark text-white">
+            <h2 class="m-0">Dashboard de Inscrições</h2>
+            <div class="d-flex align-items-center">
+                <img id="user-photo" src="default-user.png" alt="Foto do usuário" class="rounded-circle me-2" width="40" height="40" style="cursor: pointer;">
+                <span id="user-name">Usuário</span>
+            </div>
+        </header>
+
+        <div id="user-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content text-center p-4">
+                    <img id="modal-photo" src="default-user.png" class="img-fluid rounded-circle mb-3" width="150" height="150">
+                    <h4 id="modal-username"></h4>
+                    <button id="logout-btn" class="btn btn-danger mt-3">Sair</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4 py-3">
+            <button id="exportExcel" class="btn btn-primary">📊 Exportar para Excel</button>
+            <a href="index.html" class="btn btn-secondary mt-3">Voltar</a>
+        </div>
+        
+
+        <div class="mb-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="🔍 Buscar grupos de oração...">
+        </div>
+
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nome</th>
+                    <th>Responsável</th>
+                    <th>Data</th>
+                    <th>Tipo de Inscrição</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Linhas serão preenchidas via JS -->
+            </tbody>
+        </table>
+
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+    
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCd2mI-E14mkZwnTQu3l_5RnzguY5Q5BOg",
+            authDomain: "rebanhaocarnaval.firebaseapp.com",
+            databaseURL: "https://rebanhaocarnaval-default-rtdb.firebaseio.com",
+            projectId: "rebanhaocarnaval",
+            storageBucket: "rebanhaocarnaval.firebasestorage.app",
+            messagingSenderId: "1064690883975",
+            appId: "1:1064690883975:web:750fd0bde27e233c820722",
+            measurementId: "G-6JZSLS39KN",
+        };
+    
+        // Inicializa Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+    
+        // Nós para buscar no Firebase
+        const nos = ["inscricoes", "inscricoesDiarias", "inscricoesDiariaKids", "lote1", "lote1K"];
+    
+        // Função para carregar os dados de todos os nós
+        async function carregarGrupos() {
+            const grupos = [];
+    
+            // Itera por cada nó e busca os dados
+            for (const no of nos) {
+                const gruposRef = ref(db, no);  // Acessa o nó específico
+                const snapshot = await get(gruposRef);
+                const dados = snapshot.val();
+    
+                // Se houver dados, adiciona ao array de grupos
+                if (dados !== null) {
+                    // Adiciona os dados do nó à lista de grupos
+                    Object.keys(dados).forEach(key => {
+                        grupos.push({
+                            nome: dados[key].nome,
+                            grupoOracoes: dados[key].grupoOracoes,
+                            telefone: dados[key].telefone,
+                            email: dados[key].email,
+                            cidade: dados[key].cidade,
+                            dataNascimento: dados[key].dataNascimento,
+                            tipoInscricao: dados[key].tipoInscricao, // Inclui tipoInscricao
+                        });
+                    });
+                }
+            }
+            
+            return grupos;
+        }
+    
+        // Atualiza a tabela com os grupos do Firebase
+        async function atualizarTabela(filtro = "") {
+            const grupos = await carregarGrupos();
+            const tableBody = document.getElementById("tableBody");
+            tableBody.innerHTML = "";
+    
+            grupos
+                .filter(grupo => grupo.grupoOracoes.toLowerCase().includes(filtro.toLowerCase()))
+                .forEach(grupo => {
+                    const row = ` 
+                        <tr>
+                            <td>${grupo.nome}</td>
+                            <td>${grupo.grupoOracoes}</td>
+                            <td>${grupo.cidade}</td>
+                            <td>${grupo.tipoInscricao}</td>
+                        </tr>`;
+                    tableBody.innerHTML += row;
+                });
+        }
+    
+        // Evento para filtrar a busca
+        document.getElementById("searchInput").addEventListener("input", (e) => {
+            atualizarTabela(e.target.value);
+        });
+    
+        // Carregar os grupos ao iniciar
+        atualizarTabela("");
+    
+        // Exportar para Excel
+        document.getElementById("exportExcel").addEventListener("click", async () => {
+            const grupos = await carregarGrupos();
+    
+            const ws = XLSX.utils.json_to_sheet(grupos.map(grupo => ({
+                "Nome": grupo.nome,
+                "Responsável": grupo.grupoOracoes,
+                "Cidade": grupo.cidade,
+                "Tipo de Inscrição": grupo.tipoInscricao,
+            })));
+    
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Grupos de Oração");
+
+            // Estilizando a planilha
+            ws['!cols'] = [{ wch: 20 }, { wch: 30 }, { wch: 20 }, { wch: 25 }];
+            ws['A1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } };
+            ws['B1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } };
+            ws['C1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } };
+            ws['D1'].s = { font: { bold: true, color: { rgb: "FFFFFF" } }, fill: { fgColor: { rgb: "4CAF50" } } };
+
+            // Gerar e salvar o arquivo
+            XLSX.writeFile(wb, "grupos_oracao.xlsx");
+        });
+    
+        document.addEventListener("DOMContentLoaded", () => {
+            const user = JSON.parse(localStorage.getItem("user")) || { nome: "Usuário", imgUser: "default-user.png" };
+    
+            // Define nome e foto do usuário
+            document.getElementById("user-name").innerText = user.nome;
+            document.getElementById("user-photo").src = user.imgUser || "default-user.png";
+    
+            // Evento para abrir modal ao clicar na foto
+            document.getElementById("user-photo").addEventListener("click", () => {
+                document.getElementById("modal-photo").src = user.imgUser || "default-user.png";
+                document.getElementById("modal-username").innerText = user.nome;
+                new bootstrap.Modal(document.getElementById("user-modal")).show();
+            });
+    
+            // Evento para logout
+            document.getElementById("logout-btn").addEventListener("click", () => {
+                localStorage.removeItem("user"); // Remove usuário do localStorage
+                localStorage.removeItem("typeUser");
+                window.location.href = "login.html"; // Redireciona para a página de login
+            });
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

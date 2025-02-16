@@ -9,9 +9,26 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="container mt-4">
-    <h1 class="text-center mb-4">Dashboard de Inscrições</h1>
+    <header class="d-flex justify-content-between align-items-center p-3 bg-dark text-white">
+        <h2 class="m-0">Dashboard de Inscrições</h2>
+        <div class="d-flex align-items-center">
+            <img id="user-photo" src="default-user.png" alt="Foto do usuário" class="rounded-circle me-2" width="40" height="40" style="cursor: pointer;">
+            <span id="user-name">Usuário</span>
+        </div>
+    </header>
 
-    <div class="row text-center mb-4">
+
+    <div id="user-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center p-4">
+                <img id="modal-photo" src="default-user.png" class="img-fluid rounded-circle mb-3" width="150" height="150">
+                <h4 id="modal-username"></h4>
+                <button id="logout-btn" class="btn btn-danger mt-3">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center mb-4 py-3">
         <div class="col-md-4">
             <a href="index.html" class="btn btn-info">Inscrições</a>
         </div>
@@ -19,10 +36,10 @@
             <a href="powerbi.html" class="btn btn-secondary">Power BI Inscrições</a>
         </div>
         <div class="col-md-4 p-2">
-            <a class="btn btn-secondary">Power BI Relatórios</a>
+            <a  href="go.html" class="btn btn-secondary">Power BI Relatórios</a>
         </div>
         <div class="col-md-4 p-2">
-            <a class="btn btn-danger">Autenticar Inscrições</a>
+            <a href="autenticaIncs.html" class="btn btn-danger">Autenticar Inscrições</a>
         </div>
     </div>
     
@@ -47,8 +64,8 @@
         <div class="col-md-4">
             <div class="card bg-warning text-white">
                 <div class="card-body">
-                    <h5>Total de Grupos</h5>
-                    <h2 id="total-grupos">0</h2>
+                    <h5>Primeiro Retiro</h5>
+                    <h2 id="total-pRetiro">0</h2>
                 </div>
             </div>
         </div>
@@ -62,26 +79,6 @@
         <div class="col-md-6">
             <canvas id="graficoEventos"></canvas>
         </div>
-    </div>
-
-    <!-- Filtro de Pesquisa -->
-    <input type="text" id="pesquisa" class="form-control mb-3" placeholder="Pesquisar por nome...">
-    
-    <!-- Tabela -->
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>Nome</th>
-                    <th>Idade</th>
-                    <th>Grupo de Oração</th>
-                    <th>Dias do Evento</th>
-                </tr>
-            </thead>
-            <tbody id="tabela-inscricoes">
-                <!-- Dados via JS -->
-            </tbody>
-        </table>
     </div>
 
     <script type="module">
@@ -102,65 +99,104 @@
         const database = getDatabase(app);
 
         function carregarDados() {
-            const userRef = ref(database, "inscricoes");
-            get(userRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    atualizarDashboard(data);
-                } else {
-                    console.log("Nenhuma inscrição encontrada.");
-                }
-            }).catch(error => console.error("Erro ao buscar dados:", error));
+            let nos = ["inscricoes", "inscricoesDiarias", "inscricoesDiariaKids", "lote1", "lote1K"];
+            let promessas = nos.map(no => get(ref(database, no)).then(snapshot => snapshot.exists() ? snapshot.val() : {}));
+
+            Promise.all(promessas)
+                .then(results => {
+                    let dadosCombinados = Object.assign({}, ...results);
+                    atualizarDashboard(dadosCombinados);
+                })
+                .catch(error => {
+                    console.error("Erro ao buscar dados:", error);
+                });
         }
 
         function atualizarDashboard(data) {
-            const tabela = document.getElementById("tabela-inscricoes");
-            tabela.innerHTML = "";
             let totalInscritos = 0;
             let somaIdade = 0;
-            let grupos = new Set();
+            let qntdPR = 0;
             let idades = [];
             let diasEvento = {};
 
             Object.values(data).forEach((inscricao) => {
+                if(inscricao.primeiroRetiro == "Sim") {
+                    qntdPR++;
+                }
+
                 totalInscritos++;
                 somaIdade += parseInt(inscricao.idade || 0);
-                grupos.add(inscricao.grupoOracoes);
                 idades.push(inscricao.idade);
                 diasEvento[inscricao.diasEvent] = (diasEvento[inscricao.diasEvent] || 0) + 1;
-
-                const row = tabela.insertRow();
-                row.insertCell(0).innerText = inscricao.nome || "-";
-                row.insertCell(1).innerText = inscricao.idade || "-";
-                row.insertCell(2).innerText = inscricao.grupoOracoes || "-";
-                row.insertCell(3).innerText = inscricao.diasEvent || "-";
             });
 
             document.getElementById("total-inscritos").innerText = totalInscritos;
             document.getElementById("media-idade").innerText = (totalInscritos ? (somaIdade / totalInscritos).toFixed(1) : 0);
-            document.getElementById("total-grupos").innerText = grupos.size;
+            document.getElementById("total-pRetiro").innerText = qntdPR;
             atualizarGraficos(idades, diasEvento);
         }
 
         function atualizarGraficos(idades, diasEvento) {
+            let contagemIdades = {};
+            idades.forEach(idade => {
+                if(idade == '') {
+                    idade = "N/A";
+                }
+                contagemIdades[idade] = (contagemIdades[idade] || 0) + 1;
+            });
+            let idadesUnicas = Object.keys(contagemIdades);
+            let qtdIdades = Object.values(contagemIdades);
+
             new Chart(document.getElementById("graficoIdades"), {
                 type: 'bar',
-                data: { labels: idades, datasets: [{ label: 'Idades', data: idades, backgroundColor: 'blue' }] },
+                data: {
+                    labels: idadesUnicas,
+                    datasets: [{
+                        label: 'Quantidade de Pessoas',
+                        data: qtdIdades,
+                        backgroundColor: 'blue'
+                    }]
+                }
             });
+
             new Chart(document.getElementById("graficoEventos"), {
                 type: 'pie',
-                data: { labels: Object.keys(diasEvento), datasets: [{ data: Object.values(diasEvento), backgroundColor: ['red', 'green', 'yellow'] }] },
+                data: {
+                    labels: Object.keys(diasEvento),
+                    datasets: [{
+                        data: Object.values(diasEvento),
+                        backgroundColor: ['red', 'green', 'yellow']
+                    }]
+                }
             });
         }
 
-        document.getElementById("pesquisa").addEventListener("input", function () {
-            const termo = this.value.toLowerCase();
-            document.querySelectorAll("#tabela-inscricoes tr").forEach(row => {
-                row.style.display = row.cells[0].innerText.toLowerCase().includes(termo) ? "" : "none";
+        document.addEventListener("DOMContentLoaded", carregarDados);
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const user = JSON.parse(localStorage.getItem("user")) || { nome: "Usuário", imgUser: "default-user.png" };
+            
+            // Define nome e foto do usuário
+            document.getElementById("user-name").innerText = user.nome;
+            document.getElementById("user-photo").src = user.imgUser || "default-user.png";
+
+            // Evento para abrir modal ao clicar na foto
+            document.getElementById("user-photo").addEventListener("click", () => {
+                document.getElementById("modal-photo").src = user.imgUser || "default-user.png";
+                document.getElementById("modal-username").innerText = user.nome;
+                new bootstrap.Modal(document.getElementById("user-modal")).show();
+            });
+
+            // Evento para logout
+            document.getElementById("logout-btn").addEventListener("click", () => {
+                localStorage.removeItem("user"); // Remove usuário do localStorage
+                localStorage.removeItem("typeUser");
+                window.location.href = "login.html"; // Redireciona para a página de login
             });
         });
-
-        document.addEventListener("DOMContentLoaded", carregarDados);
     </script>
+    <script src="js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

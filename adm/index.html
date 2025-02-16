@@ -9,9 +9,27 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body class="container mt-4">
-    <h1 class="text-center mb-4">Dashboard de Inscrições</h1>
+    <!-- Header com Nome do Usuário e Foto -->
+    <header class="d-flex justify-content-between align-items-center p-3 bg-dark text-white">
+        <h2 class="m-0">Dashboard de Inscrições</h2>
+        <div class="d-flex align-items-center">
+            <img id="user-photo" src="default-user.png" alt="Foto do usuário" class="rounded-circle me-2" width="40" height="40" style="cursor: pointer;">
+            <span id="user-name">Usuário</span>
+        </div>
+    </header>
 
-    <div class="row text-center mb-4">
+
+    <div id="user-modal" class="modal fade" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center p-4">
+                <img id="modal-photo" src="default-user.png" class="img-fluid rounded-circle mb-3" width="150" height="150">
+                <h4 id="modal-username"></h4>
+                <button id="logout-btn" class="btn btn-danger mt-3">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row text-center mb-4 py-3">
         <div class="col-md-4">
             <a href="index.html" class="btn btn-info">Inscrições</a>
         </div>
@@ -19,13 +37,13 @@
             <a href="powerbi.html" class="btn btn-secondary">Power BI Inscrições</a>
         </div>
         <div class="col-md-4 p-2">
-            <a class="btn btn-secondary">Power BI Relatórios</a>
+            <a  href="go.html" class="btn btn-secondary">Power BI Relatórios</a>
         </div>
         <div class="col-md-4 p-2">
-            <a class="btn btn-danger">Autenticar Inscrições</a>
+            <a href="autenticaIncs.html" class="btn btn-danger">Autenticar Inscrições</a>
         </div>
     </div>
-    
+
     <div class="mb-3">
         <input type="text" id="search" class="form-control" placeholder="Pesquisar...">
     </div>
@@ -38,7 +56,7 @@
             <option value="inscricoesDiariaKids">Diária Kids</option>
         </select>
     </div>
-    
+
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead class="table-dark">
@@ -69,9 +87,10 @@
         </table>
     </div>
 
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-        import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCd2mI-E14mkZwnTQu3l_5RnzguY5Q5BOg",
@@ -87,21 +106,20 @@
         const database = getDatabase(app);
 
         function carregarDados() {
-    const filtroTipo = document.getElementById("filtroTipo").value;
-    let nos = filtroTipo ? [filtroTipo] : ["inscricoes", "inscricoesDiarias", "inscricoesDiariaKids", "lote1", "lote1K"];
+            const filtroTipo = document.getElementById("filtroTipo").value;
+            let nos = filtroTipo ? [filtroTipo] : ["inscricoes", "inscricoesDiarias", "inscricoesDiariaKids", "lote1", "lote1K"];
 
-    let promessas = nos.map(no => get(ref(database, no)).then(snapshot => snapshot.exists() ? snapshot.val() : {}));
+            let promessas = nos.map(no => get(ref(database, no)).then(snapshot => snapshot.exists() ? snapshot.val() : {}));
 
-    Promise.all(promessas)
-        .then(results => {
-            let dadosCombinados = Object.assign({}, ...results);
-            exibirDados(dadosCombinados);
-        })
-        .catch(error => {
-            console.error("Erro ao buscar dados:", error);
-        });
-}
-
+            Promise.all(promessas)
+                .then(results => {
+                    let dadosCombinados = Object.assign({}, ...results);
+                    exibirDados(dadosCombinados);
+                })
+                .catch(error => {
+                    console.error("Erro ao buscar dados:", error);
+                });
+        }
 
         function exibirDados(data) {
             const tabela = document.getElementById("tabela-inscricoes");
@@ -114,7 +132,6 @@
                 const btnExcluir = document.createElement("button");
                 btnExcluir.innerText = "Excluir";
                 btnExcluir.classList.add("btn", "btn-danger", "btn-sm");
-                btnExcluir.onclick = () => excluirInscricao(key);
                 row.insertCell(0).appendChild(btnExcluir);
 
                 row.insertCell(1).innerText = inscricao.tipoInscricao || "-";
@@ -139,30 +156,6 @@
             });
         }
 
-        function excluirInscricao(chave) {
-            Swal.fire({
-                title: "Tem certeza?",
-                text: "Essa ação não pode ser desfeita!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Sim, excluir!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    remove(ref(database, `inscricoes/${chave}`))
-                        .then(() => {
-                            Swal.fire("Excluído!", "A inscrição foi removida.", "success");
-                            carregarDados();
-                        })
-                        .catch((error) => {
-                            console.error("Erro ao excluir:", error);
-                            Swal.fire("Erro!", "Não foi possível excluir a inscrição.", "error");
-                        });
-                }
-            });
-        }
-
         document.getElementById("filtroTipo").addEventListener("change", carregarDados);
         document.getElementById("search").addEventListener("keyup", function () {
             const termo = this.value.toLowerCase();
@@ -172,6 +165,33 @@
         });
 
         document.addEventListener("DOMContentLoaded", carregarDados);
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const user = JSON.parse(localStorage.getItem("user")) || { nome: "Usuário", imgUser: "default-user.png" };
+            
+            // Define nome e foto do usuário
+            document.getElementById("user-name").innerText = user.nome;
+            document.getElementById("user-photo").src = user.imgUser || "default-user.png";
+
+            // Evento para abrir modal ao clicar na foto
+            document.getElementById("user-photo").addEventListener("click", () => {
+                document.getElementById("modal-photo").src = user.imgUser || "default-user.png";
+                document.getElementById("modal-username").innerText = user.nome;
+                new bootstrap.Modal(document.getElementById("user-modal")).show();
+            });
+
+            // Evento para logout
+            document.getElementById("logout-btn").addEventListener("click", () => {
+                localStorage.removeItem("user"); // Remove usuário do localStorage
+                localStorage.removeItem("typeUser");
+                window.location.href = "login.html"; // Redireciona para a página de login
+            });
+        });
     </script>
+    <script src="js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 </html>
